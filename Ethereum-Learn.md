@@ -270,5 +270,5 @@ contract Faucet {
 ```
 
 - 在Rinkeby Test Network上Compile后Deploy
-- 在https://rinkeby.etherscan.io上查看已发布的Contract信息
+- 在https://rinkeby.etherscan.io 上查看已发布的Contract信息
 

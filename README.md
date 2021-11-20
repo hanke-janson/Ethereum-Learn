@@ -405,6 +405,8 @@ contract Faucet {
 
 ### 2.用Geth搭建以太坊私链
 
+环境：wsl2:ubuntu20.04(不自带编译包sudo apt install build-essential),git,nodejs，go
+
 #### 2.1安装Geth
 
 一、apt-get
@@ -433,11 +435,82 @@ git clone https://github.com/ethereum/go-ethereum.git
    make geth
    ```
 
+   解决报443 超时问题
+
+   ```bash
+   make geth
+   
+   go: github.com/Azure/azure-storage-blob-go@v0.7.0: Get "https://proxy.golang.org/github.com/%21azure/azure-storage-blob-go/@v/v0.7.0.mod": dial tcp 172.217.24.17:443: i/o timeout
+   
+   make: *** [geth] Error 1
+   ```
+
+   替换一个国内的代理地址
+
+   终端命令执行：
+
+   go env -w GOPROXY=https://goproxy.cn
+
+   重新执行make geth 
+
    查看geth version ，确保在真正运行之前安装正常
 
    ```bash
    ./build/bin/geth version
    ```
 
-3. 启动节点同步
+#### 2.2启动节点同步(full、fast、light)
+
+安装好了Geth，现在我们可以尝试运行一下它。执行下面的命令，geth就会开始同步区块，并存储在当前目录下。这里的 --syncmode fast 参数表示我们会以“快速”模式同步区块。在这种模式下，我们只会下载每个区块头和区块体，但不会执行验证所有的交易，直到所有区块同步完毕再去获取一个系统当前的状态。这样就节省了很多交易验证的时间。
+
+```bash
+geth --datadir ./data --syncmode fast
+```
+
+通常，在同步以太坊区块链时，客户端会一开始就下载并验证每个块和每个交易，也就是说从创世区块开始。毫无疑问，如果我们不加--symcmode fast参数，同步将花费很长时间并且具有很高的资原要求（它将需要更多的RAM，如果你没有快速存储，则需要很长时间）。
+
+有些文章会把这个参数写成--fast，这是以前快速同步模式的参数写法，现在已经被--syncmode fast取代。如果我们想同步测试网络的区块，可以用下面的命令：
+
+```bash
+geth --testnet --datadir./data --syncmode fast
+```
+
+--testnet 这个参数会告诉 geth启动并连接到最新的测试网络，也就是Ropsten。测试网络的区块和交易数量会明显少于主网，所以会更快一点。但即使是用快速模式同步测试网络，也会需要几个小时的时间。
+
+#### 2.3搭建自己的私有链
+
+因为公共网络的区块数量太多，同步耗时太长，我们为了方便快速了解Geth，可以试着用它来搭一个只属于自己的私链。首先，我们需要创建网络的“创世”（genesis）状态，这写在一个小小的JSON文件里（例如，我们将其命名为genesis.json）：
+
+```json
+{
+    "config":{
+		"chainId":15
+	},
+	"difficulty":"2000",
+	"gasLimit":"2100000",
+	"alloc":{
+		"0xcdf02fC34b99f0FAe4eA27eF6DD62F5D03A98de2":{"balance":"300000"}
+	}
+}
+```
+
+​		要创建一条以它作为创世块的区块链，我们可以使用下面的命令:
+
+```bash
+geth --datadir . init genesis.json
+```
+
+​		在当前目录下运行geth，就会启动这条私链，注意要将networked设置为与创世块配置里的chainld一致。
+
+```bash
+geth --datadir . --networkid 15		
+```
+
+​	初始化搭建成功界面：
+
+![搭建自己的私有链成功界面](.\img\搭建自己的私有链成功界面.png)
+
+启动成功界面：
+
+![启动成功界面](.\img\启动成功界面.png)
 

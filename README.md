@@ -514,3 +514,29 @@ geth --datadir . --networkid 15
 
 ![启动成功界面](./img/启动成功界面.png)
 
+#### 2.4 geth控制台操作
+
+```bash
+geth --datadir . --networkid 15 console
+```
+
+输出信息重定向到日志文件中
+
+```bash
+geth --datadir . --networkid 15 console 2>output.log
+```
+
+开启8545端口(默认8545端口进行远程调用)
+
+```bash
+geth --datadir . --networkid 15 --http console 2>output.log
+```
+
+![rpc端口启用成功界面](./img/rpc端口启用成功界面.png)
+
+用--dev参数更容易的起一条私链，默认含有一个已解锁的矿工账户（自动挖矿），每当有交易发生时挖矿出块
+
+```bash
+geth --datadir . --dev console 2>output.log
+```
+
